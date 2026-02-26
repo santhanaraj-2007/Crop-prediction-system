@@ -1,3 +1,171 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crop Recommendation System</title>
+    <style>
+        body{
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: url("/static/farm.jpg.jpg")no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card{ 
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 400px;
+        }
+        .top-image{
+            width: 100%;
+            max-height: 220px;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px 12px 0 0;
+            margin: auto;
+
+        } 
+        h2{
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+        label{
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input{
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            transition: 0.3s;
+        }
+        button{
+            width: 100%;
+            padding: 12px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+       }
+       button:hover{
+        background: #1b5e20;
+       }
+       #result{
+        margin-top: 15px;
+        padding: 10px;
+        background: #f1f8e9;
+        border-radius: 6px;
+       }
+
+    </style>
+</head>
+<body>
+    <div class="card">
+    <img src="{{ url_for('static', filename='top.jpg') }}" class="top-image">
+    <h2>AGRO METRIC</h2>
+    <form action="/predict" method="post">
+    <label>Nitrogen (N) in kg/ha</label>
+    <input type="number" step="any" name="nitrogen" required>
+    <label>phosphorus (P) in kg/ha</label>
+    <input type="number" step="any" name="phosphorus" required>
+    <label>potassium (K) in kg/ha</label>
+    <input type="number" step="any" name="potassium" required>
+    <label>pH</label>
+    <input type="number" step="any" name="ph" required>
+    <label>Rainfall in cm</label>
+    <input type="number" step="any" name="rain" required>
+    <button type="submit">Predict</button>
+    </form>
+
+    {% if result_crop %}
+    <h2>crop: {{ result_crop }}</h2>
+    <h3>fertilizer: {{ result_fertilizer }}</h3>
+    {% endif %}
+    <p id="result" style="font-weight: bold;margin-top: 15px;"></p>
+    <h3 style="margin-top:20px;">About</h3>
+    <p style="font-size: 14px;">
+        This system recommends crops and fertilizers based on soil and environmental conditions.based on the results farmers can make accurate decissions abot plantation,irrigation
+        and fertilizer usage .That analyzes soil conditions using soil moisture sensors,npk sensors,pH sensors.the collected  data is processed through a microprocessor and cloud system ton provide real time results on a farmers mobile app or web pages.
+        This helps in improving crop growth while reducing execessive use of fertilizers and pesticides,thereby protecting soil health.
+    </p>
+    <h3 style="margin-top: 20px;">Contact </h3>
+    <p style="font-size: 14px; line-height: 1.6;">
+        email:agroadvisor@gmail.com<br>
+        phone:+91 8610903490<br>
+        location:GCE Erode (IRTT),Erode 638-316,Tamil nadu,India.
+    </p>
+    </div>
+    <script>
+        function predictCrop(){
+            let n=parseFloat(document.querySelectorAll("input")[0].value);
+            let p=parseFloat(document.querySelectorAll("input")[1].value);
+            let k=parseFloat(document.querySelectorAll("input")[2].value);
+            let ph=parseFloat(document.querySelectorAll("input")[3].value);
+            let rain=parseFloat(document.querySelectorAll("input")[4].value);
+            if(isNaN(n) ||isNaN(p) || isNaN(k) || isNaN(ph) || isNaN(rain)){
+                document.getElementById("result").innerText="please enter all values correctly.";
+                return;
+            }
+            let crop="No exact match found";
+            let fertilizer="Balanced NPK fertilizer";
+            if(n>=100 && n<=150 && p>=40 && p<=60 && k>=30 && k<=60 && ph>=5.5 && ph<=6.5 && rain>=100 && rain<=150){
+                crop="paddy";
+                fertilizer="urea,diammonium phosphate, muriate of potash";
+            }
+            else if(n>=100 && n<=120 && p>=40 && p<=60 && k>=30 && k<=40 && ph>=5.8 && ph<=7 && rain>=50 && rain<=75){
+                crop="wheat";
+                fertilizer="NOK, diammonium phosphate";
+            }
+            else if(n>=40 && n<=60 && p>=20 && p<=40 && k>=20 && k<=40 && ph>=5.5 && ph<=7.5 && rain>=250 && rain<=500){
+                crop="millet";
+                fertilizer="single super phospate,muriate of potash,organic compost";
+            }
+
+            else if(n>=100 && n<=180 && p>=40 && p<=80 && k>=30 && k<=100 && ph>=6 && ph<=6.5 && rain >=50 && rain<=80){
+                crop="corn";
+                fertilizer="ammonium nitrate, diammonium  phosphate";
+            }
+            else if(n>=50 && n<=100 && p>=25 && p<=50 && k>=25 && k<=50 && ph>=5.0 && ph<=8.0 && rain>=50 && rain<=100){
+                crop="cotton";
+                fertilizer="potassim sulphate,NPK Mix";
+            }
+            else if (n>=150 && n<=300 && p>=40 && p<=100 && k>=60 && k<=200 && ph>=6 && ph<=7.5 && rain>=150 && rain<=250){
+                crop="sugarcane";
+                fertilizer="urea,potash";
+            }
+            else if (n>=30 && n<=100 && p>=20 && p<=45 && k>=15 && k<=30 && ph>=6 && ph<=7.5 && rain>=75 &&rain<=100){
+                crop="barely";
+                fertilizer="NPK Mix, diammonium phosphate";
+            }
+            else if (n>=20 && n<=30 && p>=40 && p<=60 && k>=20 && k<=60 && ph>=6 && ph<=6.5 && rain>=50 && rain<=125){
+                crop="ground nut";
+                fertilizer="gypsum";
+            }
+            else if (n>=20 && n<=30 && p>=40 && p<=80 && k>=20 && k<=60 && ph>=5.5 && ph<=6.8 && rain>=50 && rain<=100){
+                crop="soyabean";
+                fertilizer="super phosphate";
+            }
+            else if(n>=15 && n<=20 && p>=30 && p<=60 && k>=30 && k<40 && ph>5.5 && ph<7.5 && rain >=100 && rain<=250){
+                crop="banana";
+                fertilizer="high potash,NPK Mix";
+            }
+
+            document.getElementById("result").innerText = "Recommended Crop: " + crop + "Fertilizer: " + fertilizer;
+        }
+    </script>
+</body>
+=======
 <!DOCTYPE html>
 <html>
 <head>
